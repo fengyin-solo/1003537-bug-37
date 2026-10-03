@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "smoke": "tsc -p tsconfig.smoke.json && node --loader ./scripts/esm-loader.mjs /tmp/smoke-out/scripts/smoke-disposal.js"
   },
   "dependencies": {
     "pinia": "^2.1.7",

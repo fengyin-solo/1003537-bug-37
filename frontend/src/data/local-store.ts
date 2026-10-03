@@ -36,12 +36,13 @@ export function allRows(): Record<string, EntryRow[]> {
   return cache
 }
 
-export function listRows(key: string): EntryRow[] {
-  return allRows()[key] ?? []
+// 默认按业务记录 EntryRow 读写；处置任务这类结构不同的集合用显式类型参数，仍落在同一份存储里。
+export function listRows<T = EntryRow>(key: string): T[] {
+  return (allRows()[key] ?? []) as unknown as T[]
 }
 
-export function saveRows(key: string, rows: EntryRow[]): void {
-  const next = { ...allRows(), [key]: rows }
+export function saveRows<T = EntryRow>(key: string, rows: T[]): void {
+  const next = { ...allRows(), [key]: rows as unknown as EntryRow[] }
   cache = next
   if (typeof window !== 'undefined' && window.localStorage) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))

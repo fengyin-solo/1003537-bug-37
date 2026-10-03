@@ -37,6 +37,7 @@
       <thead>
         <tr>
           <th v-for="column in columns" :key="column">{{ column }}</th>
+          <th>巡检处置反馈</th>
           <th>当前状态</th>
           <th>可执行动作</th>
         </tr>
@@ -44,6 +45,14 @@
       <tbody>
         <tr v-for="row in rows" :key="String(row.id)">
           <td v-for="column in columns" :key="column">{{ row[column] ?? '—' }}</td>
+          <td class="feedback-cell">
+            <template v-if="row['巡检处置反馈']">
+              <span v-for="(line, idx) in String(row['巡检处置反馈']).split('\n')" :key="idx" class="feedback-line">
+                {{ line }}
+              </span>
+            </template>
+            <span v-else class="muted-text">—</span>
+          </td>
           <td>{{ row.status }}</td>
           <td class="row-actions">
             <button
@@ -58,7 +67,7 @@
           </td>
         </tr>
         <tr v-if="!rows.length">
-          <td :colspan="columns.length + 2" class="empty-state">暂无站房维护数据，可先登记站房维护记录</td>
+          <td :colspan="columns.length + 3" class="empty-state">暂无站房维护数据，可先登记站房维护记录</td>
         </tr>
       </tbody>
     </table>
@@ -85,7 +94,6 @@ const meta = moduleMeta('stationhouse')
 const columns = ["记录编号", "站点编号", "维护类型", "维护内容", "维护单位", "维护日期", "费用支出", "维护状态"]
 const actions = ["安排维护", "确认完工", "通过验收"]
 const statuses = ["待安排", "已安排", "施工中", "已完成", "已验收"]
-const stats = [{"label": "待维护项数", "value": 0}, {"label": "施工中项数", "value": 0}, {"label": "本月已验收", "value": 0}]
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -98,6 +106,14 @@ const statusSummary = computed(() =>
     count: rows.value.filter((row) => String(row.status) === status).length,
   })),
 )
+
+// 其他模块（巡检问题处置）移交来的待办，按是否带处置反馈统计接收情况。
+const stats = computed(() => [
+  { label: '待维护项数', value: rows.value.filter((row) => ['待安排', '已安排'].includes(String(row.status))).length },
+  { label: '施工中项数', value: rows.value.filter((row) => String(row.status) === '施工中').length },
+  { label: '本月已验收', value: rows.value.filter((row) => String(row.status) === '已验收').length },
+  { label: '已接收巡检处置反馈', value: rows.value.filter((row) => String(row['巡检处置反馈'] ?? '').trim() !== '').length },
+])
 
 function resetFilters() {
   filters.value = {}
@@ -135,3 +151,21 @@ function reload() {
 
 onMounted(reload)
 </script>
+
+<style scoped>
+.feedback-cell {
+  min-width: 260px;
+  max-width: 360px;
+}
+.feedback-line {
+  display: block;
+  font-size: 12px;
+  color: #157347;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-bottom: 3px;
+}
+.muted-text { color: var(--muted); }
+</style>

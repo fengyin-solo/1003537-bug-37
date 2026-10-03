@@ -18,6 +18,7 @@ const Communication = () => import('@/views/communication/index.vue')
 const Stationhouse = () => import('@/views/stationhouse/index.vue')
 const Calibration = () => import('@/views/calibration/index.vue')
 const Inspection = () => import('@/views/inspection/index.vue')
+const Disposal = () => import('@/views/disposal/index.vue')
 const Plan = () => import('@/views/plan/index.vue')
 
 const router = createRouter({
@@ -41,6 +42,7 @@ const router = createRouter({
     { path: '/stationhouse', name: 'stationhouse', component: Stationhouse },
     { path: '/calibration', name: 'calibration', component: Calibration },
     { path: '/inspection', name: 'inspection', component: Inspection },
+    { path: '/disposal', name: 'disposal', component: Disposal },
     { path: '/plan', name: 'plan', component: Plan },
   ],
 })
